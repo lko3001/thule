@@ -18,7 +18,7 @@ export default function Home() {
   const [currentUser, setCurrentUser] = useState<UserProps>({} as UserProps);
   const postsToMap = { following: followingPosts, explore: posts };
   useEffect(() => {
-    if (selectedTabs === "explore" && !posts.length) {
+    if (selectedTabs === "explore") {
       fetchAllPosts();
     } else if (!followingPosts.length) {
       fetchFollowingPosts();
