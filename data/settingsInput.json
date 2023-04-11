@@ -1,0 +1,26 @@
+[
+  {
+    "inputId": "picture",
+    "label": "profile picture",
+    "placeholder": "https://unsplash.it/500/500",
+    "maxLength": 10000
+  },
+  {
+    "inputId": "username",
+    "label": "Username",
+    "placeholder": "terriblemushroom",
+    "maxLength": 30
+  },
+  {
+    "inputId": "name",
+    "label": "Name",
+    "placeholder": "Terrible Mushroom :)",
+    "maxLength": 64
+  },
+  {
+    "inputId": "biography",
+    "label": "biography",
+    "placeholder": "Hi my name is...",
+    "maxLength": 200
+  }
+]
