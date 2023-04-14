@@ -81,7 +81,8 @@ export default function Home() {
                 />
               );
             })
-          ) : session.status !== "unauthenticated" ? (
+          ) : session.status === "authenticated" &&
+            currentUser._count?.followings !== 0 ? (
             <LoadingPosts />
           ) : session.status === "unauthenticated" ? (
             <div className="dark:bg-charcoal px-8 bg-snow rounded-md flex flex-col items-center justify-center py-20">
