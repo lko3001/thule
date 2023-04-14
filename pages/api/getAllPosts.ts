@@ -9,6 +9,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const prismaUser = await prisma.user.findUnique({
       where: { email: session?.user?.email || "" },
+      include: {
+        _count: true,
+      },
     });
     const allPosts = await prisma.post.findMany({
       include: {

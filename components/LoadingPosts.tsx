@@ -21,7 +21,7 @@ export default function LoadingPosts() {
   }, [status]);
 
   return (
-    <main className="max-w-3xl md:mx-auto mx-2 flex flex-col gap-4">
+    <main className="max-w-3xl w-full md:mx-auto mx-2 flex flex-col gap-4">
       {[1, 2, 3].map((el) => (
         <div
           key={el}

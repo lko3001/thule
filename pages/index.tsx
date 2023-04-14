@@ -5,7 +5,7 @@ import LoadingPosts from "@/components/LoadingPosts";
 import { getServerSession } from "next-auth/next";
 import { GetServerSidePropsContext } from "next";
 import { authOptions } from "./api/auth/[...nextauth]";
-import { useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 
 export default function Home() {
   const session = useSession();
@@ -13,16 +13,12 @@ export default function Home() {
   const [posts, setPosts] = useState<PostProps[]>([]);
   const [followingPosts, setFollowingPosts] = useState<PostProps[]>([]);
   const [selectedTabs, setSelectedTabs] = useState<"following" | "explore">(
-    session ? "following" : "explore"
+    "explore"
   );
   const [currentUser, setCurrentUser] = useState<UserProps>({} as UserProps);
   const postsToMap = { following: followingPosts, explore: posts };
   useEffect(() => {
-    if (selectedTabs === "explore") {
-      fetchAllPosts();
-    } else if (!followingPosts.length) {
-      fetchFollowingPosts();
-    }
+    fetchAllPosts();
   }, [selectedTabs]);
 
   function fetchAllPosts() {
@@ -48,13 +44,6 @@ export default function Home() {
 
   const profileTabs: ["following", "explore"] = ["following", "explore"];
 
-  if (postsToMap[selectedTabs].length === 0)
-    return (
-      <section className="max-w-3xl lg:w-[768px] w-auto md:mx-auto">
-        <LoadingPosts />
-      </section>
-    );
-
   return (
     <>
       <section className="max-w-3xl lg:w-[768px] w-auto md:mx-auto mx-2">
@@ -73,24 +62,56 @@ export default function Home() {
           ))}
         </div>
         <div className="flex flex-col gap-4">
-          {postsToMap[selectedTabs].map((post) => {
-            return (
-              <Post
-                key={post.id}
-                id={post.id}
-                userId={post.userId}
-                title={post.title}
-                content={post.content}
-                likes={post.likes}
-                user={post.user}
-                currentUser={currentUser}
-                postType={post.postType}
-                createdAt={post.createdAt}
-                updatedAt={post.updatedAt}
-                _count={post._count}
-              />
-            );
-          })}
+          {postsToMap[selectedTabs].length !== 0 ? (
+            postsToMap[selectedTabs].map((post) => {
+              return (
+                <Post
+                  key={post.id}
+                  id={post.id}
+                  userId={post.userId}
+                  title={post.title}
+                  content={post.content}
+                  likes={post.likes}
+                  user={post.user}
+                  currentUser={currentUser}
+                  postType={post.postType}
+                  createdAt={post.createdAt}
+                  updatedAt={post.updatedAt}
+                  _count={post._count}
+                />
+              );
+            })
+          ) : currentUser._count?.followings === 0 ? (
+            <div className="dark:bg-charcoal px-8 bg-snow rounded-md flex flex-col items-center justify-center py-20">
+              <h2 className="font-medium text-xl">
+                You are not following anyone
+              </h2>
+              <p className="opacity-50 mb-4 text-center">
+                Discover new accounts in the explore page
+              </p>
+              <button
+                className="rounded-md bg-blueberry px-4 py-2 font-medium text-white uppercase text-sm whitespace-nowrap"
+                onClick={() => setSelectedTabs("explore")}
+              >
+                Explore
+              </button>
+            </div>
+          ) : session.status !== "unauthenticated" ? (
+            <LoadingPosts />
+          ) : (
+            <div className="dark:bg-charcoal px-8 bg-snow rounded-md flex flex-col items-center justify-center py-20">
+              <h2 className="font-medium text-xl">You are not authenticated</h2>
+              <p className="opacity-50 mb-4 text-center">
+                Please sign in to view the posts of the users you are following
+              </p>
+              <button
+                className="rounded-md bg-blueberry px-4 py-2 font-medium text-white uppercase text-sm whitespace-nowrap"
+                onClick={() => signIn()}
+              >
+                sign in
+              </button>
+            </div>
+          )}
         </div>
       </section>
     </>

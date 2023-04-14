@@ -11,6 +11,7 @@ import TextareaAutosize from "react-textarea-autosize";
 import { useRouter } from "next/router";
 import { Comment as CommentInterface } from "@prisma/client";
 import Comment from "@/components/Comment";
+import { signOut } from "next-auth/react";
 
 interface ExtendedComments extends CommentInterface {
   post: PostProps;
@@ -149,7 +150,7 @@ export default function Id({ user, isMe, currentUser }: IdProps) {
           <p>Sign Out</p>
           <button
             disabled={isLoading}
-            type="submit"
+            onClick={() => signOut()}
             className="rounded-md disabled:opacity-50 bg-error px-4 py-2 font-medium text-white uppercase text-sm whitespace-nowrap"
           >
             signout

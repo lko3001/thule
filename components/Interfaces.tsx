@@ -11,7 +11,17 @@ export interface PostProps extends Post {
   isTitleClickable?: boolean;
 }
 
-export interface UserProps extends User {}
+export interface UserProps extends User {
+  _count?: {
+    accounts: number;
+    sessions: number;
+    posts: number;
+    likes: number;
+    comments: number;
+    followers: number;
+    followings: number;
+  };
+}
 
 export interface IconProps {
   link?: string;
