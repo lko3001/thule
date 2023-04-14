@@ -18,7 +18,11 @@ export default function Home() {
   const [currentUser, setCurrentUser] = useState<UserProps>({} as UserProps);
   const postsToMap = { following: followingPosts, explore: posts };
   useEffect(() => {
-    fetchAllPosts();
+    if (posts.length === 0 && selectedTabs === "explore") {
+      fetchAllPosts();
+    } else if (followingPosts.length === 0 && selectedTabs === "following") {
+      fetchFollowingPosts();
+    }
   }, [selectedTabs]);
 
   function fetchAllPosts() {
@@ -32,7 +36,8 @@ export default function Home() {
       });
   }
   function fetchFollowingPosts() {
-    console.log("YEEEEEE");
+    console.log("Fetching just following posts");
+
     fetch("/api/getFollowingPosts")
       .then((res) => res.json())
       .then((data) => {
