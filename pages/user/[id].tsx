@@ -30,13 +30,24 @@ interface IdProps {
   user: ExtendedUser;
   isMe: boolean;
   currentUser: UserProps;
+  userFollowings: Following[];
+  message: "success" | "error";
 }
 type Tabs = "posts" | "comments";
 
-export default function Id({ user, isMe, currentUser }: IdProps) {
+export default function Id({
+  user,
+  isMe,
+  currentUser,
+  userFollowings,
+  message,
+}: IdProps) {
   const [areSettingsOpen, setAreSettingsOpen] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isFollowing, setIsFollowing] = useState<boolean>(
+    userFollowings.length ? true : false
+  );
   const [selectedTabs, setSelectedTabs] = useState<Tabs>("posts");
   const [inputs, setInputs] = useState<Inputs>({
     picture: user.image || "",
@@ -49,12 +60,16 @@ export default function Id({ user, isMe, currentUser }: IdProps) {
   const router = useRouter();
 
   function handleFollow() {
+    console.log("clicked follow");
     fetch("/api/followUser", {
       method: "POST",
-      body: JSON.stringify({ followingId: user.id }),
+      body: JSON.stringify({
+        followingId: user.id,
+        userFollowings: userFollowings,
+      }),
     })
       .then((res) => res.json())
-      .then((data) => console.log(data));
+      .then((data) => setIsFollowing((prev) => !prev));
   }
 
   function handleSettings() {
@@ -78,6 +93,8 @@ export default function Id({ user, isMe, currentUser }: IdProps) {
         setError(err.message);
       });
   }
+
+  if (message === "error") return <h1>ERROR</h1>;
 
   if (!user) return <h1>user Not found</h1>;
 
@@ -171,7 +188,7 @@ export default function Id({ user, isMe, currentUser }: IdProps) {
             onClick={isMe ? handleSettings : handleFollow}
             className="rounded-md bg-blueberry px-4 py-2 font-medium text-white uppercase text-sm whitespace-nowrap"
           >
-            {isMe ? "Settings" : "Follow"}
+            {isMe ? "Settings" : isFollowing ? "Following" : "Follow"}
           </button>
         </div>
         <h1 className="text-lg font-semibold">{user.name}</h1>
@@ -227,10 +244,16 @@ export default function Id({ user, isMe, currentUser }: IdProps) {
   );
 }
 
+interface Following {
+  id: string;
+  followingId: string;
+  followerId: string;
+}
+
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const userId = context.query.id;
   const session = await getServerSession(context.req, context.res, authOptions);
-  const body = { id: userId };
+  const body = { id: userId, session: session };
 
   const res = await fetch(`${process.env.NEXTAUTH_URL}/api/getSingleUser`, {
     method: "POST",
@@ -240,7 +263,15 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   const { user, currentUser } = data;
 
+  if (!user || !currentUser) return { props: { message: "error" } };
+
   const isMe = session?.user?.email === user?.email ? true : false;
 
-  return { props: { user, isMe, currentUser } };
+  const userFollowings = currentUser.followings.filter(
+    (following: Following) => following.followingId === user.id
+  );
+
+  return {
+    props: { user, isMe, currentUser, userFollowings, message: "success" },
+  };
 }

@@ -13,6 +13,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         _count: true,
       },
     });
+
+    console.log(prismaUser);
     const allPosts = await prisma.post.findMany({
       include: {
         user: true,

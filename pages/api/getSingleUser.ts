@@ -5,10 +5,12 @@ import prisma from "@/prisma/client";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const body = JSON.parse(req.body);
-  const session = await getServerSession(req, res, authOptions);
 
   const prismaUser = await prisma.user.findUnique({
-    where: { email: session?.user?.email || "" },
+    where: { email: body.session?.user?.email || "" },
+    include: {
+      followings: true,
+    },
   });
 
   const user = await prisma.user.findUnique({
@@ -24,6 +26,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       comments: { include: { post: true } },
     },
   });
+
   res.json({
     message: "successful",
     user: user,

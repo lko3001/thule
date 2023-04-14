@@ -43,7 +43,6 @@ export default function Home() {
       .then((data) => {
         console.log(data);
         setFollowingPosts(data.posts);
-        setCurrentUser(data.currentUser);
       });
   }
 

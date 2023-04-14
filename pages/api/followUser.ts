@@ -16,14 +16,24 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const prismaUser = await prisma.user.findUnique({
       where: { email: session.user?.email! },
     });
-    console.log(prismaUser?.id, body.followingId);
+
     if (prismaUser && prismaUser.id) {
-      const followedUser = await prisma.follow.create({
-        data: {
-          followerId: prismaUser.id,
-          followingId: body.followingId,
-        },
-      });
+      if (body.userFollowings.length) {
+        const followedUser = await prisma.follow.delete({
+          where: {
+            id: body.userFollowings[0].id,
+          },
+        });
+        res.json({ message: "success", followedUser: followedUser });
+      } else {
+        const followedUser = await prisma.follow.create({
+          data: {
+            followerId: prismaUser.id,
+            followingId: body.followingId,
+          },
+        });
+        res.json({ message: "success", followedUser: followedUser });
+      }
     }
   }
 };
