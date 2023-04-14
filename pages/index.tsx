@@ -81,7 +81,22 @@ export default function Home() {
                 />
               );
             })
-          ) : currentUser._count?.followings === 0 ? (
+          ) : session.status !== "unauthenticated" ? (
+            <LoadingPosts />
+          ) : session.status === "unauthenticated" ? (
+            <div className="dark:bg-charcoal px-8 bg-snow rounded-md flex flex-col items-center justify-center py-20">
+              <h2 className="font-medium text-xl">You are not authenticated</h2>
+              <p className="opacity-50 mb-4 text-center">
+                Please sign in to view the posts of the users you are following
+              </p>
+              <button
+                className="rounded-md bg-blueberry px-4 py-2 font-medium text-white uppercase text-sm whitespace-nowrap"
+                onClick={() => signIn()}
+              >
+                sign in
+              </button>
+            </div>
+          ) : (
             <div className="dark:bg-charcoal px-8 bg-snow rounded-md flex flex-col items-center justify-center py-20">
               <h2 className="font-medium text-xl">
                 You are not following anyone
@@ -94,21 +109,6 @@ export default function Home() {
                 onClick={() => setSelectedTabs("explore")}
               >
                 Explore
-              </button>
-            </div>
-          ) : session.status !== "unauthenticated" ? (
-            <LoadingPosts />
-          ) : (
-            <div className="dark:bg-charcoal px-8 bg-snow rounded-md flex flex-col items-center justify-center py-20">
-              <h2 className="font-medium text-xl">You are not authenticated</h2>
-              <p className="opacity-50 mb-4 text-center">
-                Please sign in to view the posts of the users you are following
-              </p>
-              <button
-                className="rounded-md bg-blueberry px-4 py-2 font-medium text-white uppercase text-sm whitespace-nowrap"
-                onClick={() => signIn()}
-              >
-                sign in
               </button>
             </div>
           )}
