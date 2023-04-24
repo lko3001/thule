@@ -42,9 +42,12 @@ export default function Id({
   userFollowings,
   message,
 }: IdProps) {
+  if (message === "error") return <h1>ERROR</h1>;
+
   const [areSettingsOpen, setAreSettingsOpen] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  // const [isFollowing, setIsFollowing] = useState<boolean>(false);
   const [isFollowing, setIsFollowing] = useState<boolean>(
     userFollowings.length ? true : false
   );
@@ -93,8 +96,6 @@ export default function Id({
         setError(err.message);
       });
   }
-
-  if (message === "error") return <h1>ERROR</h1>;
 
   if (!user) return <h1>user Not found</h1>;
 
@@ -167,7 +168,7 @@ export default function Id({
           <p>Sign Out</p>
           <button
             disabled={isLoading}
-            onClick={() => signOut()}
+            onClick={() => signOut({ callbackUrl: "/" })}
             className="rounded-md disabled:opacity-50 bg-error px-4 py-2 font-medium text-white uppercase text-sm whitespace-nowrap"
           >
             signout
@@ -251,6 +252,7 @@ interface Following {
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
+  console.log("CIao");
   const userId = context.query.id;
   const session = await getServerSession(context.req, context.res, authOptions);
   const body = { id: userId, session: session };
@@ -263,13 +265,15 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   const { user, currentUser } = data;
 
-  if (!user || !currentUser) return { props: { message: "error" } };
+  if (!user) return { props: { message: "error" } };
 
   const isMe = session?.user?.email === user?.email ? true : false;
 
-  const userFollowings = currentUser.followings.filter(
-    (following: Following) => following.followingId === user.id
-  );
+  const userFollowings = currentUser
+    ? currentUser.followings.filter(
+        (following: Following) => following.followingId === user.id
+      )
+    : [];
 
   return {
     props: { user, isMe, currentUser, userFollowings, message: "success" },
