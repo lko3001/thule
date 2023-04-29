@@ -1,6 +1,8 @@
 import {
   HomeIcon,
+  MoonIcon,
   PlusIcon,
+  SunIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import Icon from "./Icon";
@@ -14,9 +16,10 @@ import { useRouter } from "next/router";
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [user, setUser] = useState<UserProps | null>(null);
-  const { setTheme, theme } = useTheme();
+  const { setTheme, theme, systemTheme } = useTheme();
   const { status, data } = useSession();
   const router = useRouter();
+  const currentTheme = theme === "system" ? systemTheme : theme;
 
   useEffect(() => {
     setMounted(true);
@@ -34,13 +37,8 @@ export default function Navbar() {
       setTheme("light");
     } else if (theme === "light") {
       setTheme("dark");
-    } else if (
-      window.matchMedia &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches
-    ) {
-      setTheme("light");
     } else {
-      setTheme("dark");
+      setTheme(systemTheme!);
     }
   }
 
@@ -54,7 +52,7 @@ export default function Navbar() {
       />
       {user && (
         <>
-          <Icon icon={<PlusIcon />} />
+          <Icon icon={<PlusIcon />} link="/create" />
           <img
             src={user.image || ""}
             onClick={() => router.push(`/user/${user.id}`)}
@@ -62,6 +60,10 @@ export default function Navbar() {
           />
         </>
       )}
+      <Icon
+        icon={currentTheme === "dark" ? <SunIcon /> : <MoonIcon />}
+        handleClick={switchTheme}
+      />
       {!data?.user?.email && (
         <button
           className="rounded-md bg-blueberry px-4 py-2 font-medium text-white uppercase text-sm whitespace-nowrap"

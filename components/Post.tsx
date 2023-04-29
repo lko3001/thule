@@ -112,7 +112,6 @@ export default function Post({
         />
         <span className="-mb-[1px] opacity-50">{_count.comments}</span>
         <Icon icon={<ChatBubbleBottomCenterTextIcon />} />
-        <Icon icon={<TagIcon />} />
       </div>
     </div>
   );
